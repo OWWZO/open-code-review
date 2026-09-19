@@ -209,6 +209,9 @@ func TestParseTemplate_SessionWithComments(t *testing.T) {
 		`data-filter-kind="category" data-filter-value="other"`,
 		`data-comment-card data-category="bug" data-severity="critical"`,
 		`data-comment-card data-category="other" data-severity="low"`,
+		`<nav id="comments-pagination" class="pagination" aria-label="Review comment pages" hidden>`,
+		`<details class="comment-file-group" open hidden>`,
+		`data-comment-filter-empty aria-live="polite" hidden>No comments match this filter.`,
 		`data-comment-filter-empty`,
 	} {
 		if !strings.Contains(body, want) {

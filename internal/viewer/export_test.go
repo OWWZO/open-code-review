@@ -32,7 +32,7 @@ const (
 )
 
 // TestExportSession_SelfContained is the whole point of the feature: the page
-// must render offline, so both /static/ assets have to arrive inlined and
+// must render offline, so all /static/ assets have to arrive inlined and
 // correctly typed. A plain string in <style>/<script> is what html/template
 // rejects - it renders the literal ZgotmplZ for CSS and a JSON-escaped string
 // literal (\u003c, never a bare <) for JS - so asserting on real asset content
@@ -49,6 +49,7 @@ func TestExportSession_SelfContained(t *testing.T) {
 
 	for _, want := range []string{
 		"--font: -apple-system",                 // style.css:5, inlined verbatim
+		"window.ocrPager",                       // pager.js, inlined before session.js
 		`'<code class="inline-code">$1</code>'`, // session.js:17, inlined verbatim
 		`<span class="crumb">proj</span>`,       // the repo breadcrumb, de-linked
 		// the shared nav-brand partial, logo included, de-linked
@@ -173,6 +174,7 @@ func TestExportSession_Errors(t *testing.T) {
 func TestEmbeddedAssetsHaveNoTerminators(t *testing.T) {
 	for _, tt := range []struct{ path, terminator string }{
 		{"static/style.css", "</style"},
+		{"static/pager.js", "</script"},
 		{"static/session.js", "</script"},
 	} {
 		t.Run(tt.path, func(t *testing.T) {

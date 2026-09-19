@@ -14,7 +14,7 @@ import (
 // ExportSession renders one persisted session as a single self-contained HTML
 // document and writes it to out. It is the offline counterpart of the viewer's
 // GET /r/{repo}/{sessionID} handler: the same template and the same data, with
-// both /static/ assets inlined so the result opens over file:// with no network
+// all /static/ assets inlined so the result opens over file:// with no network
 // access at all.
 //
 // The two assets are handed to the template as template.CSS and template.JS
@@ -43,6 +43,11 @@ func ExportSession(out io.Writer, root, encodedRepo, sessionID string) error {
 	if err != nil {
 		return fmt.Errorf("read embedded script: %w", err)
 	}
+	pagerJS, err := assets.ReadFile("static/pager.js")
+	if err != nil {
+		return fmt.Errorf("read embedded pager script: %w", err)
+	}
+	js = append(append(append([]byte(nil), pagerJS...), '\n'), js...)
 
 	tmpl, err := parseTemplate("session.html")
 	if err != nil {
