@@ -211,8 +211,9 @@ func TestParseTemplate_SessionWithComments(t *testing.T) {
 		`data-comment-card data-category="other" data-severity="low"`,
 		`<nav id="comments-pagination" class="pagination" aria-label="Review comment pages" hidden>`,
 		`<details class="comment-file-group" open hidden>`,
-		`data-comment-filter-empty aria-live="polite" hidden>No comments match this filter.`,
 		`data-comment-filter-empty`,
+		`<p class="comment-filter-empty" data-comment-filter-empty role="status" hidden>`,
+		`<span class="comment-filter-label" data-marks-count aria-live="polite"></span>`,
 	} {
 		if !strings.Contains(body, want) {
 			t.Errorf("rendered page missing %q", want)

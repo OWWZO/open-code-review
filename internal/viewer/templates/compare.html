@@ -34,7 +34,7 @@
     <h3 class="compare-bucket-title"><span class="bucket-dot" aria-hidden="true"></span>{{$bucket.Title}} ({{len $bucket.Findings}})</h3>
     <div class="compare-findings" data-pagination-source data-pagination-page-size="20">
     {{range $bucket.Findings}}
-    <div class="comment-card" data-pagination-item>
+    <div class="comment-card" data-pagination-item hidden>
         <div class="comment-meta">
             {{if .Category}}<span class="comment-badge {{categoryClass .Category}}">{{.Category}}</span>{{end}}
             {{if .Severity}}<span class="comment-badge {{severityClass .Severity}}">{{.Severity}}</span>{{end}}

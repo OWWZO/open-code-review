@@ -39,7 +39,13 @@ func ExportSession(out io.Writer, root, encodedRepo, sessionID string) error {
 	if err != nil {
 		return fmt.Errorf("read embedded stylesheet: %w", err)
 	}
-	js, err := assets.ReadFile("static/session.js")
+	// The exported page needs the a11y helpers (arrow scrolling for the
+	// token breakdown) ahead of the session script that calls them.
+	a11y, err := assets.ReadFile("static/a11y.js")
+	if err != nil {
+		return fmt.Errorf("read embedded a11y script: %w", err)
+	}
+	sessionJS, err := assets.ReadFile("static/session.js")
 	if err != nil {
 		return fmt.Errorf("read embedded script: %w", err)
 	}
@@ -47,7 +53,8 @@ func ExportSession(out io.Writer, root, encodedRepo, sessionID string) error {
 	if err != nil {
 		return fmt.Errorf("read embedded pager script: %w", err)
 	}
-	js = append(append(append([]byte(nil), pagerJS...), '\n'), js...)
+	js := append(append(append([]byte(nil), a11y...), '\n'), pagerJS...)
+	js = append(append(js, '\n'), sessionJS...)
 
 	tmpl, err := parseTemplate("session.html")
 	if err != nil {
