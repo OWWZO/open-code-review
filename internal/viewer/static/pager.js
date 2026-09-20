@@ -5,8 +5,10 @@
 // it table rows or arbitrary elements; data-pagination-source markup is also
 // initialized automatically below. The pager hides every row, reveals the
 // current page slice, and renders the page-number buttons.
-// `filter` narrows the row list (the repositories search); when its external
-// state changes, call refresh() to re-apply it from page 1.
+// `filter` narrows the row list (the repositories search, session comment
+// chips). Call reset() when that filter's meaning changes, to re-apply it
+// from page 1. Call refresh() to keep the current page, which is clamped
+// if the filtered page count shrinks.
 (() => {
     const NEIGHBOURS = 2;
 
@@ -107,7 +109,7 @@
 
         render();
 
-        return { refresh: () => render(1) };
+        return { refresh: () => render(), reset: () => render(1) };
     };
 
     document.querySelectorAll("[data-pagination-source]").forEach((source) => {

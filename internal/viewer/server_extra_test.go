@@ -918,6 +918,9 @@ func TestReposJS_PagerContract(t *testing.T) {
 	if !strings.Contains(string(js), "ocrPager") || !strings.Contains(string(js), "filter:") {
 		t.Error("repos.js should hand the table and its search filter to the shared ocrPager")
 	}
+	if !strings.Contains(string(js), "pagerApi.reset()") {
+		t.Error("repos.js should reset to page 1 when the search query changes")
+	}
 }
 
 func TestPagerJS_Contract(t *testing.T) {
@@ -939,8 +942,9 @@ func TestPagerJS_Contract(t *testing.T) {
 		"pager.hidden = total < 2",
 		// Focus returns to the current page number / an enabled step.
 		"preventScroll",
-		// The repositories search re-applies its filter from page 1.
-		"refresh",
+		// refresh keeps the current page (clamped); reset starts at page 1.
+		"refresh: () => render()",
+		"reset: () => render(1)",
 		// Detail pages can hand arbitrary result elements to the same pager.
 		"data-pagination-source",
 		"data-pagination-item",
@@ -995,6 +999,7 @@ func TestSessionJS_UsesDefaultCommentPaging(t *testing.T) {
 		"let activeCategory = 'all'",
 		"pageSize: 20",
 		"rows: cards",
+		"commentsPager.reset()",
 		"commentsPager.refresh()",
 	} {
 		if !strings.Contains(string(script), want) {
@@ -1003,6 +1008,13 @@ func TestSessionJS_UsesDefaultCommentPaging(t *testing.T) {
 	}
 	if strings.Contains(string(script), "Select a severity or category to view findings.") {
 		t.Error("session.js retains an unreachable empty-state branch")
+	}
+	if idx := strings.Index(string(script), "commentsPager = window.ocrPager"); idx >= 0 {
+		if strings.Contains(string(script)[idx:], "updateFilterState()") ||
+			strings.Contains(string(script)[idx:], "commentsPager.refresh()") ||
+			strings.Contains(string(script)[idx:], "commentsPager.reset()") {
+			t.Error("session.js should not re-render comments immediately after constructing the pager")
+		}
 	}
 }
 

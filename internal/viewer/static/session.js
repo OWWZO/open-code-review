@@ -95,6 +95,12 @@ document.querySelectorAll('.response-text').forEach(function(el) {
         });
 
         if (commentsPager) {
+            commentsPager.reset();
+        }
+    }
+
+    function refreshComments() {
+        if (commentsPager) {
             commentsPager.refresh();
         }
     }
@@ -213,7 +219,7 @@ document.querySelectorAll('.response-text').forEach(function(el) {
         return marks;
     }
 
-    // Set by saveStoredMarks, read by updateFilterState. Every caller
+    // Set by saveStoredMarks, read by renderCommentState. Every caller
     // persists before triggering the next render, which is what makes the
     // warning appear at the moment a mark silently stops persisting.
     let marksSaveFailed = false;
@@ -276,7 +282,7 @@ document.querySelectorAll('.response-text').forEach(function(el) {
             }
             setMark(card.dataset.markId, button.dataset.setMark);
             applyMarkState(card, button.dataset.setMark);
-            updateFilterState();
+            refreshComments();
         });
     });
 
@@ -285,7 +291,7 @@ document.querySelectorAll('.response-text').forEach(function(el) {
         hideMarkedToggle.addEventListener('change', function() {
             hideMarked = hideMarkedToggle.checked;
             storeHideMarked(hideMarked);
-            updateFilterState();
+            refreshComments();
         });
     }
 
@@ -296,7 +302,7 @@ document.querySelectorAll('.response-text').forEach(function(el) {
             document.querySelectorAll('[data-comment-card]').forEach(function(card) {
                 applyMarkState(card, '');
             });
-            updateFilterState();
+            refreshComments();
         });
     }
 
@@ -316,5 +322,6 @@ document.querySelectorAll('.response-text').forEach(function(el) {
         filter: cardMatches,
         onRender: renderCommentState
     });
-    updateFilterState();
+    // Construction already runs the first render; calling refresh/reset
+    // here would scan every comment a second time on large sessions.
 })();
